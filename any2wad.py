@@ -90,7 +90,9 @@ pal_fence = pal_nofb[:-3] + [159, 91, 83]
 # MIP
 # http://www.gamers.org/dEngine/quake/spec/quake-spec34/qkspec_4.htm#BL2
 mipN = 4
-ratio = 2**(mipN-1)
+# ratio = 2**(mipN-1)
+ratio = 16 # compat
+
 mipdata = []
 for imagefile in imagepaths:
     name = os.path.basename(imagefile)
