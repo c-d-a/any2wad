@@ -101,17 +101,33 @@ for imagefile in imagepaths:
     except:
         print(f"WARNING: '{name}' is not a valid image file, skipping")
         continue
+
+    size = image.size
+
     if image.mode != 'P':
         print(f"'{name}' is not an indexed image, converting to Quake palette")
         if name[0] == '{':
+            if image.mode == 'RGBA':
+                print(f"Getting transparency from alpha channel in '{name}'")
+                matte = Image.new('RGB', size, (159,91,83))
+                alpha = image.split()[-1]
+                alpha = alpha.point(lambda p: p > 128 and 255) # threshold
+                matte.paste(image, mask=alpha)
+                image = matte
             dummy.putpalette(pal_fence)
         else:
             dummy.putpalette(pal_nofb)
         dummy.load()
         image.load()
         image = image._new(image.im.convert('P', 0, dummy.im))
+    elif 'transparency' in image.info and name[0] == '{':
+        print(f"Getting transparency from alpha channel in '{name}'")
+        matte = Image.new('P', size, 255)
+        alpha = image.convert('RGBA').split()[-1]
+        alpha = alpha.point(lambda p: p > 128 and 255) # threshold
+        matte.paste(image, mask=alpha)
+        image = matte
 
-    size = image.size
     if len(name) > 15:
         print(f"WARNING: name '{name}' is longer than 15 chars, truncating")
         name = name[:15]
