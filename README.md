@@ -1,15 +1,16 @@
-## Convert an image or a folder of images to a Quake WAD2 file.
+# Quake WAD2 Converter
 
-Just drag'n'drop the input folder onto the executable. Accepts all common image formats (anything that is supported by Pillow). Subfolders are included.
+Allows packing images or image folders into a .wad file, or unpacking a .wad/.bsp file into separate images. Accepts all common image formats.
 
+## Usage: 
+Drag'n'drop onto one of the executables:  
+![dragndrop](https://user-images.githubusercontent.com/55441216/189548047-b06a4dd8-3445-4ad5-8edb-c056bb4dfe1e.gif)  
+Or send it to an executable through the context menu:  
+![sendto](https://user-images.githubusercontent.com/55441216/189548087-0505d59a-5e80-4552-9829-7dd094a3046b.gif)  
+
+## Notes:  
 For indexed images, the exact pixel indices will be preserved.
 
 Other formats are converted to Quake palette without fullbright colors, with no dithering. The exception is '{'-prefixed textures that use color #255 as transparency, either by preserving the exact color (9f5b53), or by applying their alpha channel with 50% threshold.
 
-TrueColor to indexed conversion is good enough, but not always perfect. I recommend only using it for quick iteration, then converting final textures manually and packing those into a .wad.
-
-Mip sub-levels use nearest resampling (preserves exact colors, but can give blocky results and misses the point sub-mips have in the first place). GL ports do hardware mipmapping, so it doesn't matter at all. However, for software ports it does. With those in mind, you can run a .wad file you've made (or even the final .bsp) through ReMipDLX, a separate program available either as a standalone executable, or as a part of come other .wad managers. ReMip feature is beyond the scope of this script.
-
-## wad2pcx
-
-Also included is a converter back into separate indexed files.
+Mip sub-levels use nearest resampling.
