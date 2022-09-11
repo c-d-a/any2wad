@@ -128,11 +128,12 @@ for imagefile in imagepaths:
         matte.paste(image, mask=alpha)
         image = matte
 
+    if (size[0]%ratio) or (size[1]%ratio):
+        print(f"WARNING: dimensions of '{name}' aren't multiples of {ratio}")
+    name = os.path.splitext(name)[0]
     if len(name) > 15:
         print(f"WARNING: name '{name}' is longer than 15 chars, truncating")
         name = name[:15]
-    if (size[0]%ratio) or (size[1]%ratio):
-        print(f"WARNING: dimensions of '{name}' aren't multiples of {ratio}")
 
     off = [16 + 4*(2+mipN),]
     mip = [image.tobytes(),]
@@ -140,7 +141,7 @@ for imagefile in imagepaths:
         off.append(off[i-1] + len(mip[i-1]))
         mip.append(image.resize((size[0]//2**i,size[1]//2**i)).tobytes())
 
-    mipname = os.path.splitext(name)[0].replace("#","*").encode('ascii')
+    mipname = name.replace("#","*").encode('ascii')
     miptex = struct.pack(f'<16s{2+mipN}L', mipname, *size, *off)
     miptex += b''.join(mip)
     mipdata.append([mipname,miptex])
