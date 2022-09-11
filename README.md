@@ -1,6 +1,7 @@
 # Quake WAD2 Converter
 
-Allows packing images or image folders into a .wad file, or unpacking a .wad/.bsp file into separate images. Accepts all common image formats.
+Allows packing images or image folders into a .wad file, or unpacking a .wad/.bsp file into separate images.  
+Includes sub-folders. Accepts all common image formats.
 
 ## Usage: 
 Drag'n'drop onto one of the executables:  
