@@ -74,11 +74,13 @@ else:
     in_path = sys.argv[1]
 
 if not os.path.isfile(in_path):
-    if not os.path.isfile(in_path+'.wad'):
+    if os.path.isfile(in_path+'.wad'):
+        in_path += '.wad'
+    elif os.path.isfile(in_path+'.bsp'):
+        in_path += '.bsp'
+    else:
         input(f"ERROR: no such file ({in_path})")
         sys.exit()
-    else:
-        in_path += '.wad'
 wadname = os.path.splitext(os.path.basename(in_path))[0]
 if not os.path.exists(wadname):
     os.makedirs(wadname)
@@ -86,22 +88,28 @@ num_unnamed = 0
 
 # http://www.gamers.org/dEngine/quake/spec/quake-spec34
 with open (in_path, 'rb') as wad:
-
-    # wad header
-    if not wad.read(4) == b'WAD2':
-        input(f"ERROR: not a valid WAD2 file ({in_path})")
-        sys.exit()
-    numentries, diroffset = struct.unpack('<2l', wad.read(8))
-    wad.seek(diroffset)
-    
-    # wad directory
-    fmt = '<3lcch16s'
-    fmtsize = struct.calcsize(fmt)
     wadentries = []
-    for i in range(numentries):
-        wadentries.append(struct.unpack(fmt, wad.read(fmtsize)))
 
-    # wad contents
+    sig = wad.read(4)
+    if sig == b'WAD2':
+        numentries, diroffset = struct.unpack('<2l', wad.read(2*4))
+        wad.seek(diroffset)
+        fmt = '<3lcch16s'
+        fmtsize = struct.calcsize(fmt)
+        for i in range(numentries):
+            wadentries.append(struct.unpack(fmt, wad.read(fmtsize)))
+    elif sig == b'BSP2' or sig == struct.pack('<L',29):
+        header = struct.unpack('<30l', wad.read(30*4))
+        diroffset = header[4]
+        wad.seek(diroffset)
+        numentries = struct.unpack('<l', wad.read(4))[0]
+        for i in range(numentries):
+            offset = struct.unpack('<l', wad.read(4))[0] + diroffset
+            wadentries.append([offset, None, None, b'D', None, None, b''])
+    else:
+        input(f"ERROR: unrecognized file format ({in_path})")
+        sys.exit()
+
     for wadentry in wadentries:
         wad.seek(wadentry[0])
         type = wadentry[3]
